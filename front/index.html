@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Бюджетный трекер</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-   <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
@@ -24,20 +24,12 @@
                 <button class="tab" data-tab="add">Добавить</button>
             </div>
 
-            <div class="tab-content" id="transactions-tab">
-                <!-- Список транзакций будет здесь -->
-            </div>
-
-            <div class="tab-content hidden" id="categories-tab">
-                <!-- Список категорий будет здесь -->
-            </div>
-
-            <div class="tab-content hidden" id="add-tab">
-                <!-- Форма добавления будет здесь -->
-            </div>
+            <div class="tab-content" id="transactions-tab"></div>
+            <div class="tab-content hidden" id="categories-tab"></div>
+            <div class="tab-content hidden" id="add-tab"></div>
         </main>
     </div>
 
-    <script src="/static/js/app.js"></script>
+    <script src="app.js"></script> <!-- Путь исправлен -->
 </body>
 </html>
