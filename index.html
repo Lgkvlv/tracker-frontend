@@ -12,25 +12,35 @@
         <header>
             <h1>Бюджетный трекер</h1>
             <div class="balance">
-                <span>Баланс:</span>
-                <span id="balance">0 ₽</span>
+                Баланс: <span id="balance">0 ₽</span>
             </div>
         </header>
 
-        <main>
-            <div class="tabs">
-                <button class="tab active" data-tab="transactions">Транзакции</button>
-                <button class="tab" data-tab="categories">Категории</button>
-                <button class="tab" data-tab="add">Добавить</button>
-            </div>
+        <div class="tabs">
+            <button class="tab active" data-tab="transactions">Транзакции</button>
+            <button class="tab" data-tab="categories">Категории</button>
+            <button class="tab" data-tab="add">Добавить</button>
+        </div>
 
-            <div class="tab-content" id="transactions-tab"></div>
-            <div class="tab-content hidden" id="categories-tab"></div>
-            <div class="tab-content hidden" id="add-tab"></div>
-        </main>
+        <div class="tab-content" id="transactions-tab"></div>
+        
+        <div class="tab-content hidden" id="categories-tab">
+            <h2>Категории</h2>
+            <div id="categories-list"></div>
+        </div>
+        
+        <div class="tab-content hidden" id="add-tab">
+            <form id="add-transaction-form">
+                <input type="number" id="amount" placeholder="Сумма" step="0.01" required>
+                <select id="category" required>
+                    <option value="">Выберите категорию</option>
+                </select>
+                <input type="date" id="date">
+                <button type="submit">Добавить</button>
+            </form>
+        </div>
     </div>
 
     <script src="app.js"></script>
-    
 </body>
 </html>
