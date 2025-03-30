@@ -1,235 +1,100 @@
 const API_BASE_URL = "https://lgkvlv.pythonanywhere.com";
+
+// Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
-    // Инициализация Telegram WebApp
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-    
-    // Получаем данные пользователя
-    const initData = tg.initData || '';
-    const user = tg.initDataUnsafe.user;
-    
-    // Устанавливаем заголовок
-    if (user) {
-        document.querySelector('h1').textContent = `Привет, ${user.first_name}!`;
-    }
-    
-    // Инициализация табов
+    initTelegramApp();
     initTabs();
-    
-    // Загружаем данные
-    loadTransactions();
-    loadCategories();
-    
-    // Инициализация форм
-    initForms();
+    loadData();
+    setupEventListeners();
 });
 
-function initTabs() {
-    const tabs = document.querySelectorAll('.tab');
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            // Удаляем активный класс у всех табов
-            tabs.forEach(t => t.classList.remove('active'));
-            
-            // Добавляем активный класс текущему табу
-            tab.classList.add('active');
-            
-            // Скрываем все табы контента
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.add('hidden');
-            });
-            
-            // Показываем соответствующий контент
-            const tabId = tab.getAttribute('data-tab');
-            document.getElementById(`${tabId}-tab`).classList.remove('hidden');
-        });
-    });
+// Работа с Telegram WebApp
+function initTelegramApp() {
+    if (window.Telegram && window.Telegram.WebApp) {
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Растягиваем на весь экран
+        tg.enableClosingConfirmation(); // Подтверждение закрытия
+    }
 }
 
-async function loadTransactions() {
+// Загрузка данных с сервера
+async function loadData() {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/transactions/`);
-        const transactions = await response.json();
+        const [transactions, categories] = await Promise.all([
+            fetch(`${API_BASE_URL}/api/transactions/`).then(res => res.json()),
+            fetch(`${API_BASE_URL}/api/categories/`).then(res => res.json())
+        ]);
+        
         renderTransactions(transactions);
-        updateBalance(transactions);
-    } catch (error) {
-        console.error('Error loading transactions:', error);
-    }
-}
-
-async function loadCategories() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/categories/`);
-        const categories = await response.json();
         renderCategories(categories);
+        updateBalance(transactions);
+        populateCategorySelect(categories);
     } catch (error) {
-        console.error('Error loading categories:', error);
+        console.error("Ошибка загрузки данных:", error);
     }
 }
 
+// Рендер списка транзакций
 function renderTransactions(transactions) {
     const container = document.getElementById('transactions-tab');
-    container.innerHTML = '<h2>Последние операции</h2>';
+    container.innerHTML = '<h2>Последние транзакции</h2>';
     
     if (transactions.length === 0) {
         container.innerHTML += '<p>Нет операций</p>';
         return;
     }
-    
+
     const list = document.createElement('div');
-    list.className = 'transactions-list';
-    
-    transactions.forEach(transaction => {
-        const item = document.createElement('div');
-        item.className = 'transaction-item';
-        item.innerHTML = `
-            <div class="transaction-amount ${transaction.category.is_income ? 'income' : 'expense'}">
-                ${transaction.category.is_income ? '+' : '-'}${transaction.amount} ₽
-            </div>
-            <div class="transaction-info">
-                <div class="transaction-category">${transaction.category.name}</div>
-                <div class="transaction-date">${new Date(transaction.date).toLocaleDateString()}</div>
+    transactions.forEach(t => {
+        list.innerHTML += `
+            <div class="transaction">
+                <span class="amount ${t.category.is_income ? 'income' : 'expense'}">
+                    ${t.category.is_income ? '+' : '-'}${t.amount} ₽
+                </span>
+                <span>${t.category.name}</span>
+                <small>${new Date(t.date).toLocaleDateString()}</small>
             </div>
         `;
-        list.appendChild(item);
     });
-    
     container.appendChild(list);
 }
 
-function renderCategories(categories) {
-    const container = document.getElementById('categories-tab');
-    container.innerHTML = '<h2>Категории</h2>';
-    
-    if (categories.length === 0) {
-        container.innerHTML += '<p>Нет категорий</p>';
-        return;
-    }
-    
-    const list = document.createElement('div');
-    list.className = 'categories-list';
-    
-    categories.forEach(category => {
-        const item = document.createElement('div');
-        item.className = 'category-item';
-        item.innerHTML = `
-            <div class="category-name">${category.name}</div>
-            <div class="category-type">${category.is_income ? 'Доход' : 'Расход'}</div>
-        `;
-        list.appendChild(item);
-    });
-    
-    container.appendChild(list);
-}
-
-function updateBalance(transactions) {
-    let balance = 0;
-    
-    transactions.forEach(transaction => {
-        if (transaction.category.is_income) {
-            balance += parseFloat(transaction.amount);
-        } else {
-            balance -= parseFloat(transaction.amount);
-        }
-    });
-    
-    document.getElementById('balance').textContent = `${balance.toFixed(2)} ₽`;
-}
-
-function initForms() {
-    // Инициализация формы добавления транзакции
-    const addForm = document.createElement('div');
-    addForm.innerHTML = `
-        <h2>Добавить операцию</h2>
-        <form id="add-transaction-form">
-            <div class="form-group">
-                <label for="amount">Сумма</label>
-                <input type="number" id="amount" step="0.01" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="category">Категория</label>
-                <select id="category" required>
-                    <!-- Категории будут загружены динамически -->
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="description">Описание (необязательно)</label>
-                <textarea id="description"></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label for="date">Дата</label>
-                <input type="date" id="date" required>
-            </div>
-            
-            <button type="submit" class="btn">Добавить</button>
-        </form>
-    `;
-    
-    document.getElementById('add-tab').appendChild(addForm);
-    
-    // Заполняем категории в форме
-    fetch(`${API_BASE_URL}/api/categories/`)
-        .then(response => response.json())
-        .then(categories => {
-            const select = document.getElementById('category');
-            categories.forEach(category => {
-                const option = document.createElement('option');
-                option.value = category.id;
-                option.textContent = category.name;
-                select.appendChild(option);
-            });
+// Добавление новой транзакции
+async function addTransaction(amount, categoryId, date) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/transactions/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                amount: amount,
+                category_id: categoryId,
+                date: date
+            })
         });
-    
-    // Обработка отправки формы
-    document.getElementById('add-transaction-form').addEventListener('submit', async function(e) {
-        e.preventDefault();
         
-        const formData = {
-            amount: document.getElementById('amount').value,
-            category_id: document.getElementById('category').value,
-            description: document.getElementById('description').value,
-            date: document.getElementById('date').value
-        };
-        
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/transactions/`), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify(formData)
-            });
-            
-            if (response.ok) {
-                // Обновляем список транзакций
-                loadTransactions();
-                // Переключаемся на вкладку транзакций
-                document.querySelector('.tab[data-tab="transactions"]').click();
-                // Очищаем форму
-                this.reset();
-            }
-        } catch (error) {
-            console.error('Error adding transaction:', error);
+        if (response.ok) {
+            loadData(); // Перезагружаем данные
+            document.querySelector('.tab[data-tab="transactions"]').click();
         }
-    });
+    } catch (error) {
+        console.error("Ошибка добавления:", error);
+    }
 }
 
-// Вспомогательная функция для получения CSRF токена
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
+// Назначаем обработчики событий
+function setupEventListeners() {
+    // Кнопка "Добавить"
+    document.getElementById('add-transaction-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const amount = parseFloat(document.getElementById('amount').value);
+        const categoryId = document.getElementById('category').value;
+        const date = document.getElementById('date').value || new Date().toISOString().split('T')[0];
+        
+        if (amount && categoryId) {
+            addTransaction(amount, categoryId, date);
+            this.reset();
         }
-    }
-    return cookieValue;
+    });
 }
