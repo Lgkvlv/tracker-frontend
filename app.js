@@ -83,7 +83,6 @@ async function addTransaction(amount, categoryId, date) {
     }
 }
 
-// Назначаем обработчики событий
 function setupEventListeners() {
     // Кнопка "Добавить"
     document.getElementById('add-transaction-form').addEventListener('submit', function(e) {
