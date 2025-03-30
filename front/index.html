@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бюджетный трекер</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Бюджетный трекер</h1>
+            <div class="balance">
+                <span>Баланс:</span>
+                <span id="balance">0 ₽</span>
+            </div>
+        </header>
+
+        <main>
+            <div class="tabs">
+                <button class="tab active" data-tab="transactions">Транзакции</button>
+                <button class="tab" data-tab="categories">Категории</button>
+                <button class="tab" data-tab="add">Добавить</button>
+            </div>
+
+            <div class="tab-content" id="transactions-tab">
+                <!-- Список транзакций будет здесь -->
+            </div>
+
+            <div class="tab-content hidden" id="categories-tab">
+                <!-- Список категорий будет здесь -->
+            </div>
+
+            <div class="tab-content hidden" id="add-tab">
+                <!-- Форма добавления будет здесь -->
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
