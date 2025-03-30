@@ -1,3 +1,4 @@
+const API_BASE_URL = "https://lgkvlv.pythonanywhere.com";
 document.addEventListener('DOMContentLoaded', function() {
     // Инициализация Telegram WebApp
     const tg = window.Telegram.WebApp;
@@ -47,7 +48,7 @@ function initTabs() {
 
 async function loadTransactions() {
     try {
-        const response = await fetch('/api/transactions/');
+        const response = await fetch(`${API_BASE_URL}/api/transactions/`);
         const transactions = await response.json();
         renderTransactions(transactions);
         updateBalance(transactions);
@@ -58,7 +59,7 @@ async function loadTransactions() {
 
 async function loadCategories() {
     try {
-        const response = await fetch('/api/categories/');
+        const response = await fetch(`${API_BASE_URL}/api/categories/`);
         const categories = await response.json();
         renderCategories(categories);
     } catch (error) {
@@ -170,7 +171,7 @@ function initForms() {
     document.getElementById('add-tab').appendChild(addForm);
     
     // Заполняем категории в форме
-    fetch('/api/categories/')
+    fetch(`${API_BASE_URL}/api/categories/`)
         .then(response => response.json())
         .then(categories => {
             const select = document.getElementById('category');
@@ -194,7 +195,7 @@ function initForms() {
         };
         
         try {
-            const response = await fetch('/api/transactions/', {
+            const response = await fetch(`${API_BASE_URL}/api/transactions/`), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
