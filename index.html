@@ -80,77 +80,124 @@
 
   <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Проверка инициализации Telegram WebApp
-    function initTelegramApp() {
-      if (window.Telegram && Telegram.WebApp) {
-        console.log('Telegram WebApp API detected', Telegram.WebApp);
-        
-        Telegram.WebApp.ready();
-        Telegram.WebApp.expand();
-        
-        const user = Telegram.WebApp.initDataUnsafe?.user;
-        if (user) {
-          console.log('User ID:', user.id);
-          initApp(user.id);
-        } else {
-          console.error('User data not available');
-          showError("Не удалось получить данные пользователя");
-        }
-      } else {
-        console.warn('Running in non-Telegram environment');
-        // Режим для тестирования
-        initApp(12345);
-      }
+    // Элементы интерфейса
+    const balanceEl = document.getElementById('balance');
+    const qrEl = document.getElementById('qr-code');
+    const errorEl = document.createElement('div');
+    errorEl.style.color = 'red';
+    errorEl.style.padding = '10px';
+    document.body.prepend(errorEl);
+
+    // 1. Проверка окружения
+    if (!window.Telegram?.WebApp) {
+      showError("Telegram WebApp не инициализирован");
+      initTestMode();
+      return;
     }
 
+    // 2. Инициализация Telegram WebApp
+    Telegram.WebApp.ready();
+    Telegram.WebApp.expand();
+    
+    console.log("Telegram WebApp version:", Telegram.WebApp.version);
+    console.log("Init data:", Telegram.WebApp.initData);
+    console.log("Init data unsafe:", Telegram.WebApp.initDataUnsafe);
+
+    // 3. Получение данных пользователя
+    const user = Telegram.WebApp.initDataUnsafe?.user;
+    if (!user) {
+      showError("Данные пользователя недоступны. Init data: " + 
+        JSON.stringify(Telegram.WebApp.initData));
+      initTestMode();
+      return;
+    }
+
+    // 4. Инициализация приложения
+    initApp(user.id);
+
     function initApp(userId) {
-      console.log('Initializing app for user:', userId);
+      console.log("Инициализация для пользователя:", userId);
+      
+      // Обновление интерфейса
+      balanceEl.textContent = "Загрузка...";
+      generateQr(userId);
       
       // Загрузка баланса
+      fetchBalance(userId);
+      
+      // Назначение обработчиков кнопок
+      setupButtons(userId);
+    }
+
+    function fetchBalance(userId) {
       fetch(`https://lgkvlv.pythonanywhere.com/api/balance?user_id=${userId}`)
-        .then(response => response.json())
+        .then(response => {
+          if (!response.ok) throw new Error("HTTP error " + response.status);
+          return response.json();
+        })
         .then(data => {
-          document.getElementById('balance').textContent = data.balance || 0;
-          initQrCode(userId);
+          balanceEl.textContent = data.balance || 0;
         })
         .catch(error => {
-          console.error('API Error:', error);
-          showError("Ошибка загрузки данных");
+          console.error("Ошибка API:", error);
+          balanceEl.textContent = "Ошибка";
+          showError("Не удалось загрузить баланс: " + error.message);
         });
     }
 
-    function initQrCode(userId) {
-      const qrContainer = document.getElementById('qr-code');
-      if (!qrContainer) return;
-      
+    function generateQr(userId) {
       // Простая реализация QR без библиотеки
-      qrContainer.innerHTML = `
+      qrEl.innerHTML = `
         <div style="
-          width: 150px; 
-          height: 150px;
+          width: 150px; height: 150px;
           border: 2px solid #4CAF50;
           display: flex;
           align-items: center;
           justify-content: center;
           font-family: monospace;
-          word-break: break-all;
-          padding: 10px;
-          text-align: center;
+          background: white;
         ">
           ID: ${userId}
         </div>
       `;
     }
 
-    function showError(message) {
-      const errorDiv = document.createElement('div');
-      errorDiv.style.color = 'red';
-      errorDiv.style.padding = '10px';
-      errorDiv.textContent = message;
-      document.body.prepend(errorDiv);
+    function setupButtons(userId) {
+      // Обработчик кнопки истории
+      const historyBtn = document.getElementById('history-btn');
+      if (historyBtn) {
+        historyBtn.onclick = () => {
+          Telegram.WebApp.showAlert(`История для пользователя ${userId}`);
+        };
+      }
+
+      // Обработчик кнопки помощи
+      const helpBtn = document.getElementById('help-btn');
+      if (helpBtn) {
+        helpBtn.onclick = () => {
+          Telegram.WebApp.openTelegramLink('https://t.me/mini1_app1_bot?start=help');
+        };
+      }
     }
 
-    // Запуск инициализации
-    initTelegramApp();
+    function showError(message) {
+      console.error(message);
+      errorEl.textContent = message;
+    }
+
+    function initTestMode() {
+      console.warn("Запущен тестовый режим");
+      balanceEl.textContent = "150";
+      generateQr("TEST123");
+      
+      // Назначение обработчиков для тестового режима
+      document.getElementById('history-btn').onclick = () => {
+        alert("История операций (тестовый режим)");
+      };
+      
+      document.getElementById('help-btn').onclick = () => {
+        window.open("https://t.me/ваш_бот?start=help", "_blank");
+      };
+    }
   });
 </script>
