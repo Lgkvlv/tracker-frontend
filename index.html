@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -122,23 +122,24 @@
 
     // Настройка QR-кода
     function setupQrCode(userId) {
-      const qrEl = document.getElementById('qr-code');
-      if (!qrEl) return;
+  const qrEl = document.getElementById('qr-code');
+  if (!qrEl) return;
 
-      try {
-        new QRCode(qrEl, {
-          text: userId.toString(),
-          width: 150,
-          height: 150,
-          colorDark: "#4CAF50",
-          colorLight: "#ffffff"
-        });
-        debugLog("QR-код сгенерирован");
-      } catch (error) {
-        debugLog("Ошибка генерации QR: " + error);
-        qrEl.innerHTML = `<div style="padding:10px;text-align:center;">ID: ${userId}</div>`;
-      }
-    }
+  try {
+    const qr = qrcode(0, 'L');
+    qr.addData(userId.toString());
+    qr.make();
+    qrEl.innerHTML = qr.createImgTag(4, 10);
+    debugLog("QR-код сгенерирован");
+  } catch (error) {
+    debugLog("Ошибка генерации QR: " + error);
+    qrEl.innerHTML = `<div style="
+      width:100%; height:100%;
+      display:flex; align-items:center; justify-content:center;
+      font-family:monospace; word-break:break-all;
+    ">ID: ${userId}</div>`;
+  }
+}
 
     // Настройка кнопок
     function setupButtons(userId) {
