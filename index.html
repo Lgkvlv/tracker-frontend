@@ -12,39 +12,30 @@
       margin: 0;
       padding: 15px;
       background-color: #f5f5f5;
-      color: #333;
     }
     .app {
       max-width: 100%;
       background: white;
       border-radius: 10px;
       padding: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     h1 {
       color: #4CAF50;
       text-align: center;
-      margin-top: 0;
     }
     .balance {
-      font-size: 1.5em;
+      font-size: 24px;
       text-align: center;
       margin: 20px 0;
-    }
-    #balance {
-      font-weight: bold;
-      color: #4CAF50;
     }
     #qr-code {
       margin: 20px auto;
       width: 150px;
       height: 150px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       background: white;
-      border: 2px dashed #4CAF50;
-      border-radius: 10px;
+      border: 2px solid #4CAF50;
+      border-radius: 5px;
     }
     button {
       display: block;
@@ -55,158 +46,131 @@
       color: white;
       border: none;
       border-radius: 5px;
-      font-size: 1em;
+      font-size: 16px;
       cursor: pointer;
     }
-    button:active {
-      background: #3d8b40;
+    #debug {
+      margin-top: 20px;
+      padding: 10px;
+      background: #f0f0f0;
+      border-radius: 5px;
+      font-size: 12px;
     }
   </style>
 </head>
 <body>
   <div class="app">
     <h1>🛍️ Программа лояльности</h1>
-    
-    <div class="balance">
-      Ваши бонусы: <span id="balance">0</span>
-    </div>
-    
-    <div id="qr-code">
-      <!-- QR-код появится здесь -->
-    </div>
-    
+    <div class="balance">Ваши бонусы: <span id="balance">0</span></div>
+    <div id="qr-code"></div>
     <button id="history-btn">История операций</button>
     <button id="help-btn">Как получить бонусы?</button>
+    <div id="debug"></div>
   </div>
 
   <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Элементы интерфейса
-    const balanceEl = document.getElementById('balance');
-    const qrEl = document.getElementById('qr-code');
-    const errorEl = document.createElement('div');
-    errorEl.style.color = 'red';
-    errorEl.style.padding = '10px';
-    document.body.prepend(errorEl);
-
-    // 1. Проверка окружения
-    if (!window.Telegram?.WebApp) {
-      showError("Telegram WebApp не инициализирован");
-      initTestMode();
-      return;
+    // Debug функция
+    function debugLog(message) {
+      console.log(message);
+      const debugEl = document.getElementById('debug');
+      if (debugEl) {
+        debugEl.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${message}</div>`;
+      }
     }
 
-    // 2. Инициализация Telegram WebApp
-    Telegram.WebApp.ready();
-    Telegram.WebApp.expand();
-    
-    console.log("Telegram WebApp version:", Telegram.WebApp.version);
-    console.log("Init data:", Telegram.WebApp.initData);
-    console.log("Init data unsafe:", Telegram.WebApp.initDataUnsafe);
-
-    // 3. Получение данных пользователя
-    const user = Telegram.WebApp.initDataUnsafe?.user;
-    if (!user) {
-      showError("Данные пользователя недоступны. Init data: " + 
-        JSON.stringify(Telegram.WebApp.initData));
-      initTestMode();
-      return;
-    }
-
-    // 4. Инициализация приложения
-    initApp(user.id);
-
-    function initApp(userId) {
-      console.log("Инициализация для пользователя:", userId);
+    // Инициализация приложения
+    function initApp() {
+      debugLog("Инициализация приложения...");
       
-      // Обновление интерфейса
-      balanceEl.textContent = "Загрузка...";
-      generateQr(userId);
-      
-      // Загрузка баланса
-      fetchBalance(userId);
-      
-      // Назначение обработчиков кнопок
+      // Проверка Telegram WebApp API
+      if (!window.Telegram?.WebApp) {
+        debugLog("Telegram WebApp не обнаружен");
+        showError("Это приложение работает только в Telegram");
+        initTestMode();
+        return;
+      }
+
+      Telegram.WebApp.ready();
+      Telegram.WebApp.expand();
+      debugLog("Telegram WebApp инициализирован");
+
+      // Получаем ID пользователя
+      const userId = Telegram.WebApp.initDataUnsafe?.user?.id;
+      if (!userId) {
+        debugLog("Не удалось получить user_id");
+        showError("Ошибка авторизации");
+        return;
+      }
+
+      debugLog(`User ID: ${userId}`);
+      updateBalance(userId);
+      setupQrCode(userId);
       setupButtons(userId);
     }
 
-    function fetchBalance(userId) {
-      fetch(`https://lgkvlv.pythonanywhere.com/api/balance?user_id=${userId}`)
-        .then(response => {
-          if (!response.ok) throw new Error("HTTP error " + response.status);
-          return response.json();
-        })
+    // Загрузка баланса
+    function updateBalance(userId) {
+      fetch(`https://ваш-логин.pythonanywhere.com/api/balance?user_id=${userId}`)
+        .then(response => response.json())
         .then(data => {
-          balanceEl.textContent = data.balance || 0;
+          document.getElementById('balance').textContent = data.balance || 0;
         })
         .catch(error => {
-          console.error("Ошибка API:", error);
-          balanceEl.textContent = "Ошибка";
-          showError("Не удалось загрузить баланс: " + error.message);
+          debugLog("Ошибка загрузки баланса: " + error);
         });
     }
 
-   function initQrCode(userId) {
-  const qrEl = document.getElementById('qr-code');
-  if (!qrEl) return;
- 
-  if (typeof QRCode !== 'undefined') {
-    try {
-      new QRCode(qrEl, {
-        text: userId.toString(),
-        width: 150,
-        height: 150,
-        colorDark: "#4CAF50",
-        colorLight: "#ffffff"
-      });
-    } catch (e) {
-      console.error("QR код не сгенерирован:", e);
-    }
-  }
-}
+    // Настройка QR-кода
+    function setupQrCode(userId) {
+      const qrEl = document.getElementById('qr-code');
+      if (!qrEl) return;
 
+      try {
+        new QRCode(qrEl, {
+          text: userId.toString(),
+          width: 150,
+          height: 150,
+          colorDark: "#4CAF50",
+          colorLight: "#ffffff"
+        });
+        debugLog("QR-код сгенерирован");
+      } catch (error) {
+        debugLog("Ошибка генерации QR: " + error);
+        qrEl.innerHTML = `<div style="padding:10px;text-align:center;">ID: ${userId}</div>`;
+      }
+    }
+
+    // Настройка кнопок
     function setupButtons(userId) {
-      // Обработчик кнопки истории
-      const historyBtn = document.getElementById('history-btn');
-      if (historyBtn) {
-        historyBtn.onclick = () => {
-          Telegram.WebApp.showAlert(`История для пользователя ${userId}`);
-        };
-      }
+      // Кнопка истории
+      document.getElementById('history-btn').addEventListener('click', () => {
+        Telegram.WebApp.showAlert(`История бонусов для пользователя ${userId}`);
+      });
 
-      // Обработчик кнопки помощи
-      const helpBtn = document.getElementById('help-btn');
-      if (helpBtn) {
-        helpBtn.onclick = () => {
-          Telegram.WebApp.openTelegramLink('https://t.me/mini1_app1_bot?start=help');
-        };
-      }
+      // Кнопка помощи
+      document.getElementById('help-btn').addEventListener('click', () => {
+        Telegram.WebApp.openTelegramLink(`https://t.me/${Telegram.WebApp.initDataUnsafe.user?.username || 'ваш_бот'}?start=help`);
+      });
     }
 
+    // Показать ошибку
     function showError(message) {
-      console.error(message);
+      const errorEl = document.createElement('div');
+      errorEl.style.color = 'red';
+      errorEl.style.padding = '10px';
       errorEl.textContent = message;
+      document.body.prepend(errorEl);
     }
 
+    // Режим тестирования
     function initTestMode() {
-      console.warn("Запущен тестовый режим");
-      balanceEl.textContent = "150";
-      generateQr("TEST123");
-      
-      document.getElementById('history-btn').addEventListener('click', async () => {
-  try {
-    const response = await fetch(`https://ваш-логин.pythonanywhere.com/api/history?user_id=${userId}`);
-    const history = await response.json();
-    
-    let message = "Последние операции:\n";
-    history.forEach(item => {
-      message += `\n${item.date}: ${item.points} бонусов (${item.description})`;
-    });
-    
-    Telegram.WebApp.showAlert(message || "Нет данных о операциях");
-  } catch (error) {
-    Telegram.WebApp.showAlert("Ошибка загрузки истории");
-    console.error("History error:", error);
-  }
-});
-</script>
+      debugLog("Запущен тестовый режим");
+      document.getElementById('balance').textContent = '150';
+      document.getElementById('qr-code').innerHTML = 'ID: TEST123';
+    }
+
+    // Запуск приложения
+    document.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
