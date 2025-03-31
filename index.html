@@ -11,43 +11,67 @@
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 15px;
-      background-color: #f5f5f5;
+      background-color: #E3F2FD;
     }
     .app {
       max-width: 100%;
       background: white;
-      border-radius: 10px;
+      border-radius: 16px;
       padding: 20px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(30, 136, 229, 0.1);
+    }
+    .shop-name {
+      color: #1565C0;
+      font-size: 24px;
+      text-align: center;
+      margin-bottom: 8px;
+      font-weight: bold;
     }
     h1 {
-      color: #4CAF50;
+      color: #1E88E5;
       text-align: center;
+      margin-top: 0;
+      font-size: 18px;
     }
     .balance {
       font-size: 24px;
       text-align: center;
       margin: 20px 0;
+      padding: 16px;
+      background: #F5F5F5;
+      border-radius: 12px;
     }
     #qr-code {
       margin: 20px auto;
       width: 150px;
       height: 150px;
       background: white;
-      border: 2px solid #4CAF50;
-      border-radius: 5px;
+      border: 2px solid #BBDEFB;
+      border-radius: 12px;
     }
     button {
       display: block;
       width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      background: #4CAF50;
+      padding: 14px;
+      margin: 12px 0;
+      background: #1E88E5;
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 12px;
       font-size: 16px;
+      font-weight: 500;
       cursor: pointer;
+      transition: all 0.2s;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    #help-btn {
+      background: #42A5F5;
     }
     #debug {
       margin-top: 20px;
@@ -60,7 +84,8 @@
 </head>
 <body>
   <div class="app">
-    <h1>🛍️ Программа лояльности</h1>
+    <div class="shop-name">Элеганс</div>
+    <h1>Программа лояльности</h1>
     <div class="balance">Ваши бонусы: <span id="balance">0</span></div>
     <div id="qr-code"></div>
     <button id="history-btn">История операций</button>
@@ -122,24 +147,24 @@
 
     // Настройка QR-кода
     function setupQrCode(userId) {
-  const qrEl = document.getElementById('qr-code');
-  if (!qrEl) return;
+      const qrEl = document.getElementById('qr-code');
+      if (!qrEl) return;
 
-  try {
-    const qr = qrcode(0, 'L');
-    qr.addData(userId.toString());
-    qr.make();
-    qrEl.innerHTML = qr.createImgTag(4, 10);
-    debugLog("QR-код сгенерирован");
-  } catch (error) {
-    debugLog("Ошибка генерации QR: " + error);
-    qrEl.innerHTML = `<div style="
-      width:100%; height:100%;
-      display:flex; align-items:center; justify-content:center;
-      font-family:monospace; word-break:break-all;
-    ">ID: ${userId}</div>`;
-  }
-}
+      try {
+        const qr = qrcode(0, 'L');
+        qr.addData(userId.toString());
+        qr.make();
+        qrEl.innerHTML = qr.createImgTag(4, 10);
+        debugLog("QR-код сгенерирован");
+      } catch (error) {
+        debugLog("Ошибка генерации QR: " + error);
+        qrEl.innerHTML = `<div style="
+          width:100%; height:100%;
+          display:flex; align-items:center; justify-content:center;
+          font-family:monospace; word-break:break-all;
+        ">ID: ${userId}</div>`;
+      }
+    }
 
     // Настройка кнопок
     function setupButtons(userId) {
