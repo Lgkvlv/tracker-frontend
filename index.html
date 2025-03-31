@@ -110,7 +110,7 @@
 
     // Загрузка баланса
     function updateBalance(userId) {
-      fetch(`https://ваш-логин.pythonanywhere.com/api/balance?user_id=${userId}`)
+      fetch(`https://lgkvlv.pythonanywhere.com/api/balance?user_id=${userId}`)
         .then(response => response.json())
         .then(data => {
           document.getElementById('balance').textContent = data.balance || 0;
@@ -149,7 +149,7 @@
 
       // Кнопка помощи
       document.getElementById('help-btn').addEventListener('click', () => {
-        Telegram.WebApp.openTelegramLink(`https://t.me/${Telegram.WebApp.initDataUnsafe.user?.username || 'ваш_бот'}?start=help`);
+        Telegram.WebApp.openTelegramLink(`https://t.me/${Telegram.WebApp.initDataUnsafe.user?.username || 'mini2_app_bot'}?start=help`);
       });
     }
 
