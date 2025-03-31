@@ -1,45 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Бюджетный трекер</title>
+  <title>Программа лояльности</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 15px; text-align: center; }
+    #balance { font-size: 24px; font-weight: bold; color: #4CAF50; }
+    #qr-code { margin: 20px auto; width: 150px; }
+    button { padding: 10px 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; }
+  </style>
 </head>
 <body>
-  <div class="app">
-    <header>
-      <h1>💰 Бюджетный трекер</h1>
-      <div class="balance">Баланс: <span id="balance">0</span> ₽</div>
-    </header>
-
-    <nav class="tabs">
-      <button data-tab="transactions" class="active">Транзакции</button>
-      <button data-tab="categories">Категории</button>
-      <button data-tab="add">Добавить</button>
-    </nav>
-
-    <div class="tab-content active" id="transactions-tab">
-      <h2>История операций</h2>
-      <ul id="transactions-list"></ul>
-    </div>
-
-    <div class="tab-content" id="categories-tab">
-      <h2>Мои категории</h2>
-      <ul id="categories-list"></ul>
-    </div>
-
-    <div class="tab-content" id="add-tab">
-      <h2>Новая транзакция</h2>
-      <form id="transaction-form">
-        <input type="number" id="amount" placeholder="Сумма (₽)" required>
-        <input type="text" id="category" placeholder="Категория" required>
-        <button type="submit">Добавить</button>
-      </form>
-    </div>
-  </div>
-
+  <h1>🛍️ Программа лояльности</h1>
+  <p>Ваши бонусы:</p>
+  <div id="balance">0</div>
+  <div id="qr-code"></div>
+  <button id="history-btn">История</button>
+  
   <script src="app.js"></script>
 </body>
 </html>
