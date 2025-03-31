@@ -193,14 +193,20 @@
       balanceEl.textContent = "150";
       generateQr("TEST123");
       
-      // Назначение обработчиков для тестового режима
-      document.getElementById('history-btn').onclick = () => {
-        alert("История операций (тестовый режим)");
-      };
-      
-      document.getElementById('help-btn').onclick = () => {
-        window.open("https://t.me/ваш_бот?start=help", "_blank");
-      };
-    }
-  });
+      document.getElementById('history-btn').addEventListener('click', async () => {
+  try {
+    const response = await fetch(`https://ваш-логин.pythonanywhere.com/api/history?user_id=${userId}`);
+    const history = await response.json();
+    
+    let message = "Последние операции:\n";
+    history.forEach(item => {
+      message += `\n${item.date}: ${item.points} бонусов (${item.description})`;
+    });
+    
+    Telegram.WebApp.showAlert(message || "Нет данных о операциях");
+  } catch (error) {
+    Telegram.WebApp.showAlert("Ошибка загрузки истории");
+    console.error("History error:", error);
+  }
+});
 </script>
