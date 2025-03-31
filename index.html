@@ -22,17 +22,22 @@
             <button class="tab" data-tab="add">Добавить</button>
         </div>
 
-        <div class="tab-content" id="transactions-tab"></div>
-        
-        <div class="tab-content hidden" id="categories-tab">
+        <!-- Содержимое вкладок -->
+        <div id="transactions-tab" class="tab-content">
+            <h2>Последние транзакции</h2>
+            <div id="transactions-list"></div>
+        </div>
+
+        <div id="categories-tab" class="tab-content hidden">
             <h2>Категории</h2>
             <div id="categories-list"></div>
         </div>
-        
-        <div class="tab-content hidden" id="add-tab">
-            <form id="add-transaction-form">
+
+        <div id="add-tab" class="tab-content hidden">
+            <h2>Добавить транзакцию</h2>
+            <form id="transaction-form">
                 <input type="number" id="amount" placeholder="Сумма" step="0.01" required>
-                <select id="category" required>
+                <select id="category-select" required>
                     <option value="">Выберите категорию</option>
                 </select>
                 <input type="date" id="date">
