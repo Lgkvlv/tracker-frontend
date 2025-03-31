@@ -1,3 +1,10 @@
+const tg = window.Telegram.WebApp;
+tg.expand(); // Растянуть на весь экран
+
+// Получить данные пользователя
+const user = tg.initDataUnsafe.user;
+console.log("User:", user); // Проверка, что данные есть
+
 const API_BASE_URL = "https://lgkvlv.pythonanywhere.com";
 
 // Инициализация при загрузке страницы
