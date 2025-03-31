@@ -79,54 +79,78 @@
   </div>
 
   <script>
-    // Инициализация Telegram WebApp
-    if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
-      const user = Telegram.WebApp.initDataUnsafe.user;
-      Telegram.WebApp.ready();
-      Telegram.WebApp.expand();
-      
-      console.log('Telegram WebApp initialized for user:', user.id);
+  document.addEventListener('DOMContentLoaded', function() {
+    // Проверка инициализации Telegram WebApp
+    function initTelegramApp() {
+      if (window.Telegram && Telegram.WebApp) {
+        console.log('Telegram WebApp API detected', Telegram.WebApp);
+        
+        Telegram.WebApp.ready();
+        Telegram.WebApp.expand();
+        
+        const user = Telegram.WebApp.initDataUnsafe?.user;
+        if (user) {
+          console.log('User ID:', user.id);
+          initApp(user.id);
+        } else {
+          console.error('User data not available');
+          showError("Не удалось получить данные пользователя");
+        }
+      } else {
+        console.warn('Running in non-Telegram environment');
+        // Режим для тестирования
+        initApp(12345);
+      }
+    }
 
-      // 1. Загрузка баланса
-      fetch(`https://ваш-логин.pythonanywhere.com/api/balance?user_id=${user.id}`)
+    function initApp(userId) {
+      console.log('Initializing app for user:', userId);
+      
+      // Загрузка баланса
+      fetch(`https://ваш-логин.pythonanywhere.com/api/balance?user_id=${userId}`)
         .then(response => response.json())
         .then(data => {
           document.getElementById('balance').textContent = data.balance || 0;
+          initQrCode(userId);
         })
         .catch(error => {
-          console.error('Error loading balance:', error);
-          document.getElementById('balance').textContent = '?';
+          console.error('API Error:', error);
+          showError("Ошибка загрузки данных");
         });
-
-      // 2. Генерация QR-кода (упрощенная версия)
-      const qrCode = document.getElementById('qr-code');
-      if (qrCode) {
-        qrCode.innerHTML = `
-          <svg width="140" height="140" viewBox="0 0 100 100">
-            <rect width="100" height="100" fill="#fff"/>
-            <text x="50" y="50" font-size="8" text-anchor="middle" fill="#4CAF50">
-              ID: ${user.id}
-            </text>
-          </svg>
-        `;
-      }
-
-      // 3. Кнопка истории
-      document.getElementById('history-btn').addEventListener('click', () => {
-        Telegram.WebApp.showAlert(`История операций будет здесь!\nID: ${user.id}`);
-      });
-
-      // 4. Кнопка помощи
-      document.getElementById('help-btn').addEventListener('click', () => {
-        Telegram.WebApp.openTelegramLink('https://t.me/ваш_бот?start=help');
-      });
-
-    } else {
-      console.warn('Running in non-Telegram environment');
-      // Режим тестирования
-      document.getElementById('balance').textContent = '150';
-      document.getElementById('qr-code').innerHTML = 'ID: TEST123';
     }
-  </script>
-</body>
-</html>
+
+    function initQrCode(userId) {
+      const qrContainer = document.getElementById('qr-code');
+      if (!qrContainer) return;
+      
+      // Простая реализация QR без библиотеки
+      qrContainer.innerHTML = `
+        <div style="
+          width: 150px; 
+          height: 150px;
+          border: 2px solid #4CAF50;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: monospace;
+          word-break: break-all;
+          padding: 10px;
+          text-align: center;
+        ">
+          ID: ${userId}
+        </div>
+      `;
+    }
+
+    function showError(message) {
+      const errorDiv = document.createElement('div');
+      errorDiv.style.color = 'red';
+      errorDiv.style.padding = '10px';
+      errorDiv.textContent = message;
+      document.body.prepend(errorDiv);
+    }
+
+    // Запуск инициализации
+    initTelegramApp();
+  });
+</script>
