@@ -1,51 +1,41 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Бюджетный трекер</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="styles.css">
+  <title>Бюджетный трекер</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Бюджетный трекер</h1>
-            <div class="balance">
-                Баланс: <span id="balance">0 ₽</span>
-            </div>
-        </header>
-
-        <div class="tabs">
-            <button class="tab active" data-tab="transactions">Транзакции</button>
-            <button class="tab" data-tab="categories">Категории</button>
-            <button class="tab" data-tab="add">Добавить</button>
-        </div>
-
-        <!-- Содержимое вкладок -->
-        <div id="transactions-tab" class="tab-content">
-            <h2>Последние транзакции</h2>
-            <div id="transactions-list"></div>
-        </div>
-
-        <div id="categories-tab" class="tab-content hidden">
-            <h2>Категории</h2>
-            <div id="categories-list"></div>
-        </div>
-
-        <div id="add-tab" class="tab-content hidden">
-            <h2>Добавить транзакцию</h2>
-            <form id="transaction-form">
-                <input type="number" id="amount" placeholder="Сумма" step="0.01" required>
-                <select id="category-select" required>
-                    <option value="">Выберите категорию</option>
-                </select>
-                <input type="date" id="date">
-                <button type="submit">Добавить</button>
-            </form>
-        </div>
+  <div class="app">
+    <h1>Бюджетный трекер</h1>
+    <div class="balance">Баланс: <span id="balance">0</span> ₽</div>
+    
+    <div class="tabs">
+      <button data-tab="transactions">Транзакции</button>
+      <button data-tab="categories">Категории</button>
+      <button data-tab="add">Добавить</button>
     </div>
 
-    <script src="app.js"></script>
+    <div id="transactions-tab" class="tab-content active">
+      <h2>Транзакции</h2>
+      <ul id="transactions-list"></ul>
+    </div>
+
+    <div id="categories-tab" class="tab-content">
+      <h2>Категории</h2>
+      <ul id="categories-list"></ul>
+    </div>
+
+    <div id="add-tab" class="tab-content">
+      <h2>Добавить транзакцию</h2>
+      <input type="number" id="amount" placeholder="Сумма">
+      <input type="text" id="category" placeholder="Категория">
+      <button id="submit-transaction">Добавить</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
