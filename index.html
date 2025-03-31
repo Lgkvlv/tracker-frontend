@@ -107,7 +107,7 @@
       console.log('Initializing app for user:', userId);
       
       // Загрузка баланса
-      fetch(`https://ваш-логин.pythonanywhere.com/api/balance?user_id=${userId}`)
+      fetch(`https://lgkvlv.pythonanywhere.com/api/balance?user_id=${userId}`)
         .then(response => response.json())
         .then(data => {
           document.getElementById('balance').textContent = data.balance || 0;
