@@ -5,7 +5,7 @@ if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
   Telegram.WebApp.expand();
 
   // Загрузка баланса
-  fetch(`https://ваш-логин.pythonanywhere.com/api/balance?user_id=${user.id}`)
+  fetch(`https://lgkvlv.pythonanywhere.com/api/balance?user_id=${user.id}`)
     .then(res => res.json())
     .then(data => {
       document.getElementById('balance').textContent = data.balance;
