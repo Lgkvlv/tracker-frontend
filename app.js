@@ -18,28 +18,18 @@ document.addEventListener('DOMContentLoaded', function() {
   if (!qrEl) return;
 
   try {
-    // 1. Инициализация генератора QR-кода
-    const qr = qrcode(0, 'L');  // L - уровень коррекции ошибок (Low)
+    const qr = qrcode(0, 'L');
     qr.addData(userId.toString());
     qr.make();
-
-    // 2. Создаем изображение с увеличенными модулями
-    const qrImgTag = qr.createImgTag(4, 0);  // 4 - размер модуля, 0 - отступы
-    
-    // 3. Вставляем в контейнер
-    qrEl.innerHTML = qrImgTag;
-    
-    // 4. Принудительно растягиваем
-    const img = qrEl.querySelector('img');
-    if (img) {
-      img.style.width = '100%';
-      img.style.height = '100%';
-    }
-
+    qrEl.innerHTML = qr.createImgTag(4, 10);
     debugLog("QR-код сгенерирован");
   } catch (error) {
     debugLog("Ошибка генерации QR: " + error);
-    qrEl.innerHTML = `<div class="qr-fallback">ID: ${userId}</div>`;
+    qrEl.innerHTML = `<div style="
+      width:100%; height:100%;
+      display:flex; align-items:center; justify-content:center;
+      font-family:monospace; word-break:break-all;
+    ">ID: ${userId}</div>`;
   }
 }
 
