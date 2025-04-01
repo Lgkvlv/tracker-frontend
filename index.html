@@ -134,6 +134,23 @@
       setupButtons(userId);
     }
 
+    function registerUser(userId) {
+  fetch(`https://lgkvlv.pythonanywhere.com/api/register_user/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: `user_id=${userId}`
+  })
+  .then(response => response.json())
+  .then(data => {
+    debugLog("Пользователь зарегистрирован");
+  })
+  .catch(error => {
+    debugLog("Ошибка регистрации: " + error);
+  });
+}
+    
     // Загрузка баланса
     function updateBalance(userId) {
       fetch(`https://lgkvlv.pythonanywhere.com/api/balance?user_id=${userId}`)
