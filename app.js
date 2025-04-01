@@ -13,14 +13,13 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('balance').textContent = data.balance || 0;
       });
 
-    // Генерация QR-кода (простая версия)
     const qrContainer = document.getElementById('qr-code');
-    if (qrContainer) {
-      qrContainer.innerHTML = `<svg width="150" height="150" viewBox="0 0 100 100">
-        <rect width="100" height="100" fill="#fff"/>
-        <text x="50" y="50" font-size="10" text-anchor="middle">${user.id}</text>
-      </svg>`;
-    }
+if (qrContainer) {
+  qrContainer.innerHTML = `<svg width="200" height="200" viewBox="0 0 100 100" style="border: 2px solid #BBDEFB; border-radius: 12px">
+    <rect width="100" height="100" fill="#fff"/>
+    <text x="50" y="50" font-size="15" text-anchor="middle" fill="#1E88E5">${user.id}</text>
+  </svg>`;
+}
 
     // Обработчик кнопки истории
     const historyBtn = document.getElementById('history-btn');
