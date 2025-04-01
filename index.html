@@ -153,15 +153,33 @@
     
     // Загрузка баланса
     function updateBalance(userId) {
-      fetch(`https://lgkvlv.pythonanywhere.com/api/balance?user_id=${userId}`)
-        .then(response => response.json())
-        .then(data => {
-          document.getElementById('balance').textContent = data.balance || 0;
-        })
-        .catch(error => {
-          debugLog("Ошибка загрузки баланса: " + error);
-        });
+  const apiUrl = `https://lgkvlv.pythonanywhere.com/api/balance?user_id=${userId}`;
+  
+  debugLog(`Запрос баланса по URL: ${apiUrl}`);
+  
+  fetch(apiUrl, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+    },
+    mode: 'cors' // Явно указываем режим CORS
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+    return response.json();
+  })
+  .then(data => {
+    debugLog("Получены данные баланса: " + JSON.stringify(data));
+    document.getElementById('balance').textContent = data.balance ?? 0;
+  })
+  .catch(error => {
+    debugLog("Ошибка загрузки баланса: " + error.message);
+    document.getElementById('balance').textContent = "?";
+    showError("Ошибка соединения. Попробуйте позже.");
+  });
+}
 
     // Настройка QR-кода
     function setupQrCode(userId) {
