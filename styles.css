@@ -44,8 +44,8 @@ header h1 {
 }
 
 .qr-container {
-  width: 200px; /* Фиксированная ширина квадрата */
-  height: 200px; /* Фиксированная высота квадрата */
+  width: 200px;
+  height: 200px;
   margin: 20px auto;
   padding: 10px;
   background: white;
@@ -70,71 +70,6 @@ header h1 {
   object-fit: contain;
 }
 
-.tabs {
-  display: flex;
-  justify-content: space-around;
-  margin-bottom: 24px;
-  gap: 8px;
-}
-
-.tabs button {
-  padding: 12px 16px;
-  border: none;
-  background: #E3F2FD;
-  border-radius: 12px;
-  cursor: pointer;
-  flex: 1;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-.tabs button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.tabs button.active {
-  background: #1E88E5;
-  color: white;
-}
-
-.tab-content {
-  display: none;
-}
-
-.tab-content.active {
-  display: block;
-}
-
-#transactions-list, #categories-list {
-  list-style: none;
-  padding: 0;
-}
-
-#transactions-list li, #categories-list li {
-  padding: 12px;
-  margin: 8px 0;
-  background: #F5F5F5;
-  border-radius: 12px;
-  transition: background 0.2s;
-}
-
-#transactions-list li:hover, #categories-list li:hover {
-  background: #E3F2FD;
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-input {
-  padding: 12px;
-  border: 1px solid #BBDEFB;
-  border-radius: 12px;
-  font-size: 16px;
-}
 
 button {
   padding: 14px;
