@@ -157,7 +157,7 @@
   const apiUrl = `https://lgkvlv.pythonanywhere.com/api/balance/?user_id=${userId}&_=${Date.now()}`;
   
   try {
-    debugLog(`⌛ Отправка запроса баланса для ${userId}`);
+    debugLog(`Отправка запроса баланса для ${userId}`);
     
     // Показываем индикатор загрузки
     balanceElement.textContent = "...";
@@ -171,24 +171,23 @@
       cache: 'no-store'
     });
 
-    debugLog(`🔍 Статус ответа: ${response.status}`);
+    debugLog(`Статус ответа: ${response.status}`);
     
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
     const data = await response.json();
-    debugLog(`✅ Получен баланс: ${JSON.stringify(data)}`);
+    debugLog(`Получен баланс: ${JSON.stringify(data)}`);
     
     // Успешное отображение
     balanceElement.textContent = data.balance;
     balanceElement.style.color = "#000";
     
   } catch (error) {
-    debugLog(`❌ Ошибка: ${error.message}`);
+    debugLog(`Ошибка: ${error.message}`);
     console.error("Детали ошибки:", error);
     
-    // Показываем дружелюбное сообщение
     balanceElement.textContent = "—";
     balanceElement.style.color = "#FF5722";
     
@@ -227,7 +226,7 @@
 
       // Кнопка помощи
       document.getElementById('help-btn').addEventListener('click', () => {
-        Telegram.WebApp.openTelegramLink(`https://t.me/${Telegram.WebApp.initDataUnsafe.user?.username || 'mini2_app_bot'}?start=help`);
+        Telegram.WebApp.showAlert(`Покупайте изделия в нашем магазине, сканируйте QR-код и получайте бонусы`);
       });
     }
 
@@ -238,13 +237,6 @@
       errorEl.style.padding = '10px';
       errorEl.textContent = message;
       document.body.prepend(errorEl);
-    }
-
-    // Режим тестирования
-    function initTestMode() {
-      debugLog("Запущен тестовый режим");
-      document.getElementById('balance').textContent = '150';
-      document.getElementById('qr-code').innerHTML = 'ID: TEST123';
     }
 
     // Запуск приложения
