@@ -152,22 +152,49 @@
 }
     
     // Загрузка баланса
-    function updateBalance(userId) {
-  const apiUrl = `https://lgkvlv.pythonanywhere.com/api/balance/?user_id=${userId}`; 
+    async function updateBalance(userId) {
+  const balanceElement = document.getElementById('balance');
+  const apiUrl = `https://lgkvlv.pythonanywhere.com/api/balance/?user_id=${userId}&_=${Date.now()}`;
   
-  fetch(apiUrl)
-    .then(response => {
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-      return response.json();
-    })
-    .then(data => {
-      document.getElementById('balance').textContent = data.balance ?? 0;
-    })
-    .catch(error => {
-      console.error("Ошибка:", error);
-      document.getElementById('balance').textContent = "—"; 
-      showError("Ошибка соединения. Попробуйте позже.");
+  try {
+    debugLog(`⌛ Отправка запроса баланса для ${userId}`);
+    
+    // Показываем индикатор загрузки
+    balanceElement.textContent = "...";
+    balanceElement.style.color = "#666";
+    
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+      cache: 'no-store'
     });
+
+    debugLog(`🔍 Статус ответа: ${response.status}`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    debugLog(`✅ Получен баланс: ${JSON.stringify(data)}`);
+    
+    // Успешное отображение
+    balanceElement.textContent = data.balance;
+    balanceElement.style.color = "#000";
+    
+  } catch (error) {
+    debugLog(`❌ Ошибка: ${error.message}`);
+    console.error("Детали ошибки:", error);
+    
+    // Показываем дружелюбное сообщение
+    balanceElement.textContent = "—";
+    balanceElement.style.color = "#FF5722";
+    
+    // Повторяем запрос через 3 секунды
+    setTimeout(() => updateBalance(userId), 3000);
+  }
 }
 
     // Настройка QR-кода
