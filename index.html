@@ -108,7 +108,7 @@
     function initApp() {
       debugLog("Инициализация приложения...");
       
-      // Проверка Telegram WebApp API
+     // Проверка Telegram WebApp API
       if (!window.Telegram?.WebApp) {
         debugLog("Telegram WebApp не обнаружен");
         showError("Это приложение работает только в Telegram");
@@ -129,34 +129,11 @@
       }
 
       debugLog(`User ID: ${userId}`);
-
-      // Сначала регистрируем пользователя
-      registerUser(userId);
-
-      // Затем загружаем баланс и настраиваем интерфейс
       updateBalance(userId);
       setupQrCode(userId);
       setupButtons(userId);
+    }
 
-
-    function registerUser(userId) {
-  fetch(`https://lgkvlv.pythonanywhere.com/api/register_user/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: `user_id=${userId}`
-  })
-  .then(response => response.json())
-  .then(data => {
-    debugLog("Статус регистрации: " + data.status);
-  })
-  .catch(error => {
-    debugLog("Ошибка регистрации: " + error);
-  });
-}
-
-    
     // Загрузка баланса
     function updateBalance(userId) {
       fetch(`https://lgkvlv.pythonanywhere.com/api/balance?user_id=${userId}`)
