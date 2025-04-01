@@ -43,6 +43,33 @@ header h1 {
   text-align: center;
 }
 
+.qr-container {
+  width: 200px; /* Фиксированная ширина квадрата */
+  height: 200px; /* Фиксированная высота квадрата */
+  margin: 20px auto;
+  padding: 10px;
+  background: white;
+  border: 2px solid #BBDEFB;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#qr-code {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#qr-code img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 .tabs {
   display: flex;
   justify-content: space-around;
