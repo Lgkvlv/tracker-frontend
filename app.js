@@ -1,11 +1,25 @@
 document.addEventListener('DOMContentLoaded', function() {
-  // Инициализация Telegram WebApp
-  if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
-    const user = Telegram.WebApp.initDataUnsafe.user;
+ function initApp() {
+    // Проверка Telegram WebApp API
+    if (!window.Telegram?.WebApp) {
+      showError("Это приложение работает только в Telegram");
+      return;
+    }
+
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
-    console.log('User ID:', user.id); // Для отладки
 
+    // Получаем ID пользователя
+    const userId = Telegram.WebApp.initDataUnsafe?.user?.id;
+    if (!userId) {
+      showError("Ошибка авторизации");
+      return;
+    }
+
+    updateBalance(userId);
+    setupQrCode(userId);
+    setupButtons(userId);
+  }
     // Загрузка баланса
     function updateBalance(userId) {
     fetch(`https://lgkvlv.pythonanywhere.com/api/balance?user_id=${userId}`)
