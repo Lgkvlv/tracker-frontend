@@ -13,12 +13,34 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('balance').textContent = data.balance || 0;
       });
 
-    const qrContainer = document.getElementById('qr-code');
-if (qrContainer) {
-  qrContainer.innerHTML = `<svg width="200" height="200" viewBox="0 0 100 100" style="border: 2px solid #BBDEFB; border-radius: 12px">
-    <rect width="100" height="100" fill="#fff"/>
-    <text x="50" y="50" font-size="15" text-anchor="middle" fill="#1E88E5">${user.id}</text>
-  </svg>`;
+   function setupQrCode(userId) {
+  const qrEl = document.getElementById('qr-code');
+  if (!qrEl) return;
+
+  try {
+    // 1. Инициализация генератора QR-кода
+    const qr = qrcode(0, 'L');  // L - уровень коррекции ошибок (Low)
+    qr.addData(userId.toString());
+    qr.make();
+
+    // 2. Создаем изображение с увеличенными модулями
+    const qrImgTag = qr.createImgTag(4, 0);  // 4 - размер модуля, 0 - отступы
+    
+    // 3. Вставляем в контейнер
+    qrEl.innerHTML = qrImgTag;
+    
+    // 4. Принудительно растягиваем
+    const img = qrEl.querySelector('img');
+    if (img) {
+      img.style.width = '100%';
+      img.style.height = '100%';
+    }
+
+    debugLog("QR-код сгенерирован");
+  } catch (error) {
+    debugLog("Ошибка генерации QR: " + error);
+    qrEl.innerHTML = `<div class="qr-fallback">ID: ${userId}</div>`;
+  }
 }
 
     // Обработчик кнопки истории
