@@ -43,8 +43,8 @@
     }
     #qr-code {
       margin: 20px auto;
-      width: 200px;
-      height: 200px;
+      width: 150px;
+      height: 150px;
       background: white;
       border: 2px solid #BBDEFB;
       border-radius: 12px;
@@ -120,7 +120,7 @@
       Telegram.WebApp.expand();
       debugLog("Telegram WebApp инициализирован");
 
-      // Получаем ID пользователя
+      // Получение ID тг
       const userId = Telegram.WebApp.initDataUnsafe?.user?.id;
       if (!userId) {
         debugLog("Не удалось получить user_id");
@@ -151,13 +151,13 @@
   });
 }
     
-    // Загрузка баланса
+    // Баланс
     async function updateBalance(userId) {
   const balanceElement = document.getElementById('balance');
   const apiUrl = `https://lgkvlv.pythonanywhere.com/api/balance/?user_id=${userId}&_=${Date.now()}`;
   
   try {
-    debugLog(`Отправка запроса баланса для ${userId}`);
+    debugLog(`Запрос баланса для ${userId}`);
     
     // Показываем индикатор загрузки
     balanceElement.textContent = "...";
@@ -191,7 +191,6 @@
     balanceElement.textContent = "—";
     balanceElement.style.color = "#FF5722";
     
-    // Повторяем запрос через 3 секунды
     setTimeout(() => updateBalance(userId), 3000);
   }
 }
@@ -221,7 +220,8 @@
     function setupButtons(userId) {
       // Кнопка истории
       document.getElementById('history-btn').addEventListener('click', () => {
-        Telegram.WebApp.showAlert(`История бонусов для пользователя ${userId}`);
+        Telegram.WebApp.showAlert(`История бонусов для пользователя ${userId}: 
+        Начисление бонусов за регистрацию: +100`);
       });
 
       // Кнопка помощи
