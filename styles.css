@@ -44,8 +44,9 @@ header h1 {
 }
 
 .qr-container {
-  width: 200px;
-  height: 200px;
+  max-width: 300px;
+  max-height: 300px;
+  width: 80%;
   margin: 20px auto;
   padding: 10px;
   background: white;
