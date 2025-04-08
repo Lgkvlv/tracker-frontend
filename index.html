@@ -221,20 +221,50 @@
     }
 
     function setupQrCode(userId) {
-      const qrEl = document.getElementById('qr-code');
-      if (!qrEl) return;
+  const qrEl = document.getElementById('qr-code');
+  if (!qrEl) return;
 
-      try {
-        const qr = qrcode(0, 'L');
-        qr.addData(userId.toString());
-        qr.make();
-        qrEl.innerHTML = qr.createImgTag(4, 0);
-        debugLog("QR-код сгенерирован");
-      } catch (error) {
-        qrEl.innerHTML = `<div style="text-align:center;">ID: ${userId}</div>`;
-        debugLog("Ошибка генерации QR: " + error);
-      }
+  // Создаем оверлей
+  const overlay = document.createElement('div');
+  overlay.className = 'qr-overlay';
+  document.body.appendChild(overlay);
+
+  try {
+    const qr = qrcode(0, 'L');
+    qr.addData(userId.toString());
+    qr.make();
+    qrEl.innerHTML = qr.createImgTag(4, 0);
+    
+    // Добавляем обработчик клика
+    const qrImg = qrEl.querySelector('img');
+    if (qrImg) {
+      qrImg.style.cursor = 'pointer';
+      qrImg.addEventListener('click', function() {
+        qrImg.classList.toggle('enlarged');
+        overlay.classList.toggle('active');
+        
+        // Блокируем прокрутку при открытом QR-коде
+        if (qrImg.classList.contains('enlarged')) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      });
     }
+    
+    // Закрытие по клику на оверлей
+    overlay.addEventListener('click', function() {
+      qrImg.classList.remove('enlarged');
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    });
+
+    debugLog("QR-код сгенерирован");
+  } catch (error) {
+    qrEl.innerHTML = `<div style="text-align:center;">ID: ${userId}</div>`;
+    debugLog("Ошибка генерации QR: " + error);
+  }
+}
 
     function setupButtons(userId) {
       document.getElementById('history-btn').addEventListener('click', () => {
