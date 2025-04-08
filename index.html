@@ -79,7 +79,7 @@
       border-radius: 8px;
     }
 
-.qr-code.enlarged {
+#qr-code.enlarged {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -240,7 +240,7 @@
     if (qrImg) {
       qrImg.style.cursor = 'pointer';
       qrImg.addEventListener('click', function() {
-        qrImg.classList.toggle('enlarged');
+        qrEl.classList.toggle('enlarged');
         overlay.classList.toggle('active');
         
         // Блокируем прокрутку при открытом QR-коде
@@ -254,7 +254,7 @@
     
     // Закрытие по клику на оверлей
     overlay.addEventListener('click', function() {
-      qrImg.classList.remove('enlarged');
+      qrEl.classList.remove('enlarged');
       overlay.classList.remove('active');
       document.body.style.overflow = '';
     });
