@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
+  <meta charset="UTF-8" />
   <title>Программа лояльности</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
   <style>
@@ -13,6 +13,7 @@
       padding: 15px;
       background-color: #E3F2FD;
     }
+
     .app {
       max-width: 100%;
       background: white;
@@ -20,6 +21,7 @@
       padding: 20px;
       box-shadow: 0 4px 12px rgba(30, 136, 229, 0.1);
     }
+
     .shop-name {
       color: #1565C0;
       font-size: 24px;
@@ -27,12 +29,14 @@
       margin-bottom: 8px;
       font-weight: bold;
     }
+
     h1 {
       color: #1E88E5;
       text-align: center;
       margin-top: 0;
       font-size: 18px;
     }
+
     .balance {
       font-size: 24px;
       text-align: center;
@@ -41,14 +45,40 @@
       background: #F5F5F5;
       border-radius: 12px;
     }
-    #qr-code {
-      margin: 20px auto;
-      width: 150px;
-      height: 150px;
+
+    .qr-wrapper {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .qr-container {
+      width: 160px;
+      height: 160px;
+      padding: 10px;
       background: white;
       border: 2px solid #BBDEFB;
       border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
+
+    #qr-code {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #qr-code img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
     button {
       display: block;
       width: 100%;
@@ -63,16 +93,20 @@
       cursor: pointer;
       transition: all 0.2s;
     }
+
     button:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
+
     button:active {
       transform: translateY(0);
     }
+
     #help-btn {
       background: #42A5F5;
     }
+
     #debug {
       margin-top: 20px;
       padding: 10px;
@@ -87,21 +121,19 @@
     <div class="shop-name">Элеганс</div>
     <h1>Программа лояльности</h1>
     <div class="balance">Ваши бонусы: <span id="balance">0</span></div>
+
     <div class="qr-wrapper">
- <div class="qr-wrapper">
-  <div class="qr-container">
-    <div id="qr-code"></div>
-  </div>
-</div>
+      <div class="qr-container">
+        <div id="qr-code"></div>
+      </div>
+    </div>
 
-<button id="history-btn">История операций</button>
-<button id="help-btn">Как получить бонусы?</button>
-<div id="debug"></div>
-
+    <button id="history-btn">История операций</button>
+    <button id="help-btn">Как получить бонусы?</button>
+    <div id="debug"></div>
   </div>
 
   <script>
-    // Debug функция
     function debugLog(message) {
       console.log(message);
       const debugEl = document.getElementById('debug');
@@ -110,15 +142,12 @@
       }
     }
 
-    // Инициализация приложения
     function initApp() {
       debugLog("Инициализация приложения...");
-      
-     // Проверка Telegram WebApp API
+
       if (!window.Telegram?.WebApp) {
         debugLog("Telegram WebApp не обнаружен");
         showError("Это приложение работает только в Telegram");
-        initTestMode();
         return;
       }
 
@@ -126,7 +155,6 @@
       Telegram.WebApp.expand();
       debugLog("Telegram WebApp инициализирован");
 
-      // Получение ID тг
       const userId = Telegram.WebApp.initDataUnsafe?.user?.id;
       if (!userId) {
         debugLog("Не удалось получить user_id");
@@ -140,68 +168,30 @@
       setupButtons(userId);
     }
 
-    function registerUser(userId) {
-  fetch(`https://lgkvlv.pythonanywhere.com/api/register_user/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: `user_id=${userId}`
-  })
-  .then(response => response.json())
-  .then(data => {
-    debugLog("Пользователь зарегистрирован");
-  })
-  .catch(error => {
-    debugLog("Ошибка регистрации: " + error);
-  });
-}
-    
-    // Баланс
-    async function updateBalance(userId) {
-  const balanceElement = document.getElementById('balance');
-  const apiUrl = `https://lgkvlv.pythonanywhere.com/api/balance/?user_id=${userId}&_=${Date.now()}`;
-  
-  try {
-    debugLog(`Запрос баланса для ${userId}`);
-    
-    // Показываем индикатор загрузки
-    balanceElement.textContent = "...";
-    balanceElement.style.color = "#666";
-    
-    const response = await fetch(apiUrl, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-      cache: 'no-store'
-    });
+    function updateBalance(userId) {
+      const balanceElement = document.getElementById('balance');
+      const apiUrl = `https://lgkvlv.pythonanywhere.com/api/balance/?user_id=${userId}&_=${Date.now()}`;
 
-    debugLog(`Статус ответа: ${response.status}`);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+      balanceElement.textContent = "...";
+      balanceElement.style.color = "#666";
+
+      fetch(apiUrl)
+        .then(res => {
+          debugLog(`Статус ответа: ${res.status}`);
+          return res.json();
+        })
+        .then(data => {
+          balanceElement.textContent = data.balance;
+          balanceElement.style.color = "#000";
+          debugLog(`Получен баланс: ${JSON.stringify(data)}`);
+        })
+        .catch(err => {
+          balanceElement.textContent = "—";
+          balanceElement.style.color = "#FF5722";
+          debugLog("Ошибка: " + err.message);
+        });
     }
 
-    const data = await response.json();
-    debugLog(`Получен баланс: ${JSON.stringify(data)}`);
-    
-    // Успешное отображение
-    balanceElement.textContent = data.balance;
-    balanceElement.style.color = "#000";
-    
-  } catch (error) {
-    debugLog(`Ошибка: ${error.message}`);
-    console.error("Детали ошибки:", error);
-    
-    balanceElement.textContent = "—";
-    balanceElement.style.color = "#FF5722";
-    
-    setTimeout(() => updateBalance(userId), 3000);
-  }
-}
-
-    // Настройка QR-кода
     function setupQrCode(userId) {
       const qrEl = document.getElementById('qr-code');
       if (!qrEl) return;
@@ -210,42 +200,32 @@
         const qr = qrcode(0, 'L');
         qr.addData(userId.toString());
         qr.make();
-        qrEl.innerHTML = qr.createImgTag(4, 10);
+        qrEl.innerHTML = qr.createImgTag(4, 0);
         debugLog("QR-код сгенерирован");
       } catch (error) {
+        qrEl.innerHTML = `<div style="text-align:center;">ID: ${userId}</div>`;
         debugLog("Ошибка генерации QR: " + error);
-        qrEl.innerHTML = `<div style="
-          width:100%; height:100%;
-          display:flex; align-items:center; justify-content:center;
-          font-family:monospace; word-break:break-all;
-        ">ID: ${userId}</div>`;
       }
     }
 
-    // Настройка кнопок
     function setupButtons(userId) {
-      // Кнопка истории
       document.getElementById('history-btn').addEventListener('click', () => {
-        Telegram.WebApp.showAlert(`История бонусов для пользователя ${userId}: 
-        Начисление бонусов за регистрацию: +100`);
+        Telegram.WebApp.showAlert(`История бонусов для пользователя ${userId}:\nНачисление бонусов за регистрацию: +100`);
       });
 
-      // Кнопка помощи
       document.getElementById('help-btn').addEventListener('click', () => {
-        Telegram.WebApp.showAlert(`Покупайте изделия в нашем магазине, сканируйте QR-код и получайте бонусы`);
+        Telegram.WebApp.showAlert("Покупайте изделия в нашем магазине, сканируйте QR-код и получайте бонусы");
       });
     }
 
-    // Показать ошибку
-    function showError(message) {
-      const errorEl = document.createElement('div');
-      errorEl.style.color = 'red';
-      errorEl.style.padding = '10px';
-      errorEl.textContent = message;
-      document.body.prepend(errorEl);
+    function showError(msg) {
+      const el = document.createElement('div');
+      el.style.color = 'red';
+      el.style.padding = '10px';
+      el.textContent = msg;
+      document.body.prepend(el);
     }
 
-    // Запуск приложения
     document.addEventListener('DOMContentLoaded', initApp);
   </script>
 </body>
