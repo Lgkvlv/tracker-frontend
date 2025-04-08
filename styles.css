@@ -1,52 +1,45 @@
 body {
-  font-family: 'Arial', sans-serif;
+  font-family: Arial, sans-serif;
   margin: 0;
-  padding: 0;
+  padding: 15px;
   background-color: #E3F2FD;
-  color: #212121;
 }
 
 .app {
   max-width: 100%;
-  padding: 20px;
   background: white;
-  min-height: 100vh;
-  border-radius: 16px 16px 0 0;
-  box-shadow: 0 -2px 10px rgba(30, 136, 229, 0.1);
-}
-
-header {
-  text-align: center;
-  margin-bottom: 24px;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(30, 136, 229, 0.1);
 }
 
 .shop-name {
   color: #1565C0;
   font-size: 24px;
-  font-weight: bold;
+  text-align: center;
   margin-bottom: 8px;
+  font-weight: bold;
 }
 
-header h1 {
-  margin: 0;
+h1 {
   color: #1E88E5;
+  text-align: center;
+  margin-top: 0;
   font-size: 18px;
 }
 
 .balance {
-  font-size: 1.2em;
-  font-weight: bold;
-  margin: 16px 0;
+  font-size: 24px;
+  text-align: center;
+  margin: 20px 0;
   padding: 16px;
   background: #F5F5F5;
   border-radius: 12px;
-  text-align: center;
 }
 
 .qr-wrapper {
   display: flex;
   justify-content: center;
-  align-items: center;
   margin: 20px 0;
 }
 
@@ -75,35 +68,76 @@ header h1 {
   height: 100%;
   object-fit: contain;
   border-radius: 8px;
+  cursor: pointer;
 }
 
+#qr-code.enlarged {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  max-width: 70vw;
+  max-height: 70vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.qr-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.qr-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
 
 button {
+  display: block;
+  width: 100%;
   padding: 14px;
-  background: #1E88E5; 
+  margin: 12px 0;
+  background: #1E88E5;
   color: white;
   border: none;
   border-radius: 12px;
-  cursor: pointer;
   font-size: 16px;
   font-weight: 500;
+  cursor: pointer;
   transition: all 0.2s;
 }
 
 button:hover {
-  background: #1565C0; 
   transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 button:active {
   transform: translateY(0);
 }
 
-.secondary-btn {
+#help-btn {
   background: #42A5F5;
 }
 
-.secondary-btn:hover {
-  background: #1E88E5;
+#debug {
+  margin-top: 20px;
+  padding: 10px;
+  background: #f0f0f0;
+  border-radius: 5px;
+  font-size: 12px;
 }
