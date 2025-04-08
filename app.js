@@ -1,81 +1,119 @@
-document.addEventListener('DOMContentLoaded', function() {
- function initApp() {
-    // Проверка Telegram WebApp API
-    if (!window.Telegram?.WebApp) {
-      showError("Это приложение работает только в Telegram");
-      return;
-    }
-
-    Telegram.WebApp.ready();
-    Telegram.WebApp.expand();
-
-    // Получаем ID пользователя
-    const userId = Telegram.WebApp.initDataUnsafe?.user?.id;
-    if (!userId) {
-      showError("Ошибка авторизации");
-      return;
-    }
-
-    updateBalance(userId);
-    setupQrCode(userId);
-    setupButtons(userId);
+// Debug-логирование
+function debugLog(message) {
+  console.log(message);
+  const debugEl = document.getElementById('debug');
+  if (debugEl) {
+    debugEl.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${message}</div>`;
   }
-    // Загрузка баланса
-    function updateBalance(userId) {
-    fetch(`https://lgkvlv.pythonanywhere.com/api/balance?user_id=${userId}`)
-      .then(response => response.json())
-      .then(data => {
-        document.getElementById('balance').textContent = data.balance || 0;
-      })
-      .catch(error => {
-        document.getElementById('balance').textContent = '0';
-      });
-  }
+}
 
-    const setupQrCode = (userId) => {
+function showError(msg) {
+  const el = document.createElement('div');
+  el.style.color = 'red';
+  el.style.padding = '10px';
+  el.textContent = msg;
+  document.body.prepend(el);
+}
+
+function updateBalance(userId) {
+  const balanceElement = document.getElementById('balance');
+  const apiUrl = `https://lgkvlv.pythonanywhere.com/api/balance/?user_id=${userId}&_=${Date.now()}`;
+
+  balanceElement.textContent = "...";
+  balanceElement.style.color = "#666";
+
+  fetch(apiUrl)
+    .then(res => res.json())
+    .then(data => {
+      balanceElement.textContent = data.balance;
+      balanceElement.style.color = "#000";
+      debugLog(`Получен баланс: ${JSON.stringify(data)}`);
+    })
+    .catch(err => {
+      balanceElement.textContent = "—";
+      balanceElement.style.color = "#FF5722";
+      debugLog("Ошибка: " + err.message);
+    });
+}
+
+function setupQrCode(userId) {
   const qrEl = document.getElementById('qr-code');
   if (!qrEl) return;
 
+  const overlay = document.createElement('div');
+  overlay.className = 'qr-overlay';
+  document.body.appendChild(overlay);
+
   try {
-    const qr = qrcode(0, 'H'); // Максимальная коррекция
+    const qr = qrcode(0, 'L');
     qr.addData(userId.toString());
     qr.make();
-
-    // Генерируем QR с масштабом 8, без отступов
-    qrEl.innerHTML = qr.createImgTag(8, 0);
-
-  } catch (error) {
-    console.error("Ошибка генерации QR:", error);
-    qrEl.innerHTML = `<div style="
-      width:100%; height:100%;
-      display:flex; align-items:center; justify-content:center;
-      font-family:monospace; word-break:break-all;
-    ">ID: ${userId}</div>`;
-  }
-};
-
+    qrEl.innerHTML = qr.createImgTag(4, 0);
+    
+    const qrImg = qrEl.querySelector('img');
+    if (qrImg) {
+      qrImg.style.cursor = 'pointer';
+      qrImg.addEventListener('click', function() {
+        qrEl.classList.toggle('enlarged');
+        overlay.classList.toggle('active');
+        
       
-      debugLog("QR-код сгенерирован");
-    } catch (error) {
-      debugLog("Ошибка генерации QR: " + error);
-      qrEl.innerHTML = `<div style="
-        width:100%; height:100%;
-        display:flex; align-items:center; justify-content:center;
-        font-family:monospace; word-break:break-all;
-      ">ID: ${userId}</div>`;
-    }
-  };
-
-    // Обработчик кнопки истории
-    const historyBtn = document.getElementById('history-btn');
-    if (historyBtn) {
-      historyBtn.addEventListener('click', () => {
-        Telegram.WebApp.showAlert(`История операций для пользователя ${user.id}`);
+        if (qrEl.classList.contains('enlarged')) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
       });
     }
-  } else {
-    console.error('Telegram WebApp not initialized');
-    // Режим тестирования без Telegram
-    document.getElementById('balance').textContent = '100';
+    
+
+    overlay.addEventListener('click', function() {
+      qrEl.classList.remove('enlarged');
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    });
+
+    debugLog("QR-код сгенерирован");
+  } catch (error) {
+    qrEl.innerHTML = `<div style="text-align:center;">ID: ${userId}</div>`;
+    debugLog("Ошибка генерации QR: " + error);
   }
-});
+}
+
+function setupButtons(userId) {
+  document.getElementById('history-btn').addEventListener('click', () => {
+    Telegram.WebApp.showAlert(`История бонусов для пользователя ${userId}:\nНачисление бонусов за регистрацию: +100`);
+  });
+
+  document.getElementById('help-btn').addEventListener('click', () => {
+    Telegram.WebApp.showAlert("Покупайте изделия в нашем магазине, сканируйте QR-код и получайте бонусы");
+  });
+}
+
+function initApp() {
+  debugLog("Инициализация приложения...");
+
+  if (!window.Telegram?.WebApp) {
+    debugLog("Telegram WebApp не обнаружен");
+    showError("Это приложение работает только в Telegram");
+    return;
+  }
+
+  Telegram.WebApp.ready();
+  Telegram.WebApp.expand();
+  debugLog("Telegram WebApp инициализирован");
+
+  const userId = Telegram.WebApp.initDataUnsafe?.user?.id;
+  if (!userId) {
+    debugLog("Не удалось получить user_id");
+    showError("Ошибка авторизации");
+    return;
+  }
+
+  debugLog(`User ID: ${userId}`);
+  updateBalance(userId);
+  setupQrCode(userId);
+  setupButtons(userId);
+}
+
+document.addEventListener('DOMContentLoaded', initApp);
