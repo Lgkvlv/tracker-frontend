@@ -176,15 +176,12 @@
       balanceElement.style.color = "#666";
 
       fetch(apiUrl)
-        .then(res => {
-          debugLog(`Статус ответа: ${res.status}`);
-          return res.json();
-        })
-        .then(data => {
-          balanceElement.textContent = data.balance;
-          balanceElement.style.color = "#000";
-          debugLog(`Получен баланс: ${JSON.stringify(data)}`);
-        })
+    .then(res => res.json())
+    .then(data => {
+      balanceElement.textContent = data.balance;
+      balanceElement.style.color = "#000";
+      debugLog(`Получен баланс: ${JSON.stringify(data)}`);
+    })
         .catch(err => {
           balanceElement.textContent = "—";
           balanceElement.style.color = "#FF5722";
