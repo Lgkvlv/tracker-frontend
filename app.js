@@ -82,7 +82,7 @@ function setupQrCode(userId) {
 
 function setupButtons(userId) {
   document.getElementById('history-btn').addEventListener('click', () => {
-    Telegram.WebApp.showAlert(`История бонусов для пользователя ${userId}:\nНачисление бонусов за регистрацию: +100`);
+    Telegram.WebApp.showAlert(`История бонусов для пользователя ${userId}:\nЗдесь будет ваша история`);
   });
 
   document.getElementById('help-btn').addEventListener('click', () => {
